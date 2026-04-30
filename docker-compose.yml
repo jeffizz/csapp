@@ -1,0 +1,16 @@
+services:
+  csapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: csapp-lab:latest
+    platform: linux/amd64
+    container_name: csapp
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./:/csapp
+    deploy:
+      resources:
+        limits:
+          memory: 4G
