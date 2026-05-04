@@ -1,8 +1,8 @@
-/* 
- * CS:APP Data Lab 
- * 
+/*
+ * CS:APP Data Lab
+ *
  * <Please put your name and userid here>
- * 
+ *
  * bits.c - Source file with your solutions to the Lab.
  *          This is the file you will hand in to your instructor.
  *
@@ -10,7 +10,7 @@
  * compiler. You can still use printf for debugging without including
  * <stdio.h>, although you might get a compiler warning. In general,
  * it's not good practice to ignore compiler warnings, but in this
- * case it's OK.  
+ * case it's OK.
  */
 
 #if 0
@@ -24,11 +24,11 @@ You will provide your solution to the Data Lab by
 editing the collection of functions in this source file.
 
 INTEGER CODING RULES:
- 
+
   Replace the "return" statement in each function with one
-  or more lines of C code that implements the function. Your code 
+  or more lines of C code that implements the function. Your code
   must conform to the following style:
- 
+
   int Funct(arg1, arg2, ...) {
       /* brief description of how your implementation works */
       int var1 = Expr1;
@@ -47,7 +47,7 @@ INTEGER CODING RULES:
   2. Function arguments and local variables (no global variables).
   3. Unary integer operations ! ~
   4. Binary integer operations & ^ | + << >>
-    
+
   Some of the problems restrict the set of allowed operators even further.
   Each "Expr" may consist of multiple operators. You are not restricted to
   one operator per line.
@@ -62,7 +62,7 @@ INTEGER CODING RULES:
   7. Use any data type other than int.  This implies that you
      cannot use arrays, structs, or unions.
 
- 
+
   You may assume that your machine:
   1. Uses 2s complement, 32-bit representations of integers.
   2. Performs right shifts arithmetically.
@@ -108,7 +108,7 @@ You are expressly forbidden to:
 
 
 NOTES:
-  1. Use the dlc (data lab checker) compiler (described in the handout) to 
+  1. Use the dlc (data lab checker) compiler (described in the handout) to
      check the legality of your solutions.
   2. Each function has a maximum number of operations (integer, logical,
      or comparison) that you are allowed to use for your implementation
@@ -118,56 +118,65 @@ NOTES:
   3. Use the btest test harness to check your functions for correctness.
   4. Use the BDD checker to formally verify your functions
   5. The maximum number of ops for each function is given in the
-     header comment for each function. If there are any inconsistencies 
+     header comment for each function. If there are any inconsistencies
      between the maximum ops in the writeup and in this file, consider
      this file the authoritative source.
 
 /*
  * STEP 2: Modify the following functions according the coding rules.
- * 
+ *
  *   IMPORTANT. TO AVOID GRADING SURPRISES:
  *   1. Use the dlc compiler to check that your solutions conform
  *      to the coding rules.
- *   2. Use the BDD checker to formally verify that your solutions produce 
+ *   2. Use the BDD checker to formally verify that your solutions produce
  *      the correct answers.
  */
 
 
 #endif
 //1
-/* 
- * bitXor - x^y using only ~ and & 
+/*
+ * bitXor - x^y using only ~ and &
  *   Example: bitXor(4, 5) = 1
  *   Legal ops: ~ &
  *   Max ops: 14
  *   Rating: 1
  */
 int bitXor(int x, int y) {
-  return 2;
+  // 1010 0101 --> 0101 1010
+  // 0110 1101 --> 0110 1101
+  // 1100 1000  |  0100 1000
+  // TODO
+  return ~x & y;
 }
-/* 
- * tmin - return minimum two's complement integer 
+
+/*
+ * tmin - return minimum two's complement integer
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 4
  *   Rating: 1
  */
 int tmin(void) {
-
-  return 2;
-
+  return 1<<31;
 }
 //2
 /*
  * isTmax - returns 1 if x is the maximum, two's complement number,
- *     and 0 otherwise 
+ *     and 0 otherwise
  *   Legal ops: ! ~ & ^ | +
  *   Max ops: 10
  *   Rating: 1
  */
 int isTmax(int x) {
-  return 2;
+  // TMax: 0x7fffffff
+  // TMin: 0x80000000
+  // -1:   0xffffffff
+  // 0:    0x00000000
+  // !x | ((~x + 1) ^ x) = 0, if and only if x = Tmin
+  return !((~x^(x+1)) | !(x+1));
 }
-/* 
+
+/*
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
  *   where bits are numbered from 0 (least significant) to 31 (most significant)
  *   Examples allOddBits(0xFFFFFFFD) = 0, allOddBits(0xAAAAAAAA) = 1
@@ -176,20 +185,25 @@ int isTmax(int x) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-  return 2;
+  int a = x & 0xaa;
+  int b = (x>>8) & 0xaa;
+  int c = (x>>16) & 0xaa;
+  int d = (x>>24) & 0xaa;
+  return !((a & b & c & d) ^ 0xaa);
 }
-/* 
- * negate - return -x 
+
+/*
+ * negate - return -x
  *   Example: negate(1) = -1.
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 5
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+  return ~x + 1;
 }
-//3
-/* 
+
+/*
  * isAsciiDigit - return 1 if 0x30 <= x <= 0x39 (ASCII codes for characters '0' to '9')
  *   Example: isAsciiDigit(0x35) = 1.
  *            isAsciiDigit(0x3a) = 0.
@@ -199,40 +213,70 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  return 2;
+// 0000 ... 0011 0000 - 0000 ... 0011 1001
+  int a = (x & 0x30) ^ 0x30;
+  int b = ((x + 6) & 0x30) ^ 0x30;
+  int c = x >> 6;
+  return !a & !b & !c;
 }
-/* 
- * conditional - same as x ? y : z 
+/*
+ * conditional - same as x ? y : z
  *   Example: conditional(2,4,5) = 4
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 16
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+  // Want:
+  // x !=0  --> (-1 & y) | (0 & z)
+  // x == 0 --> (0 & y) | (-1 & z)
+  // Find e
+  // when x != 0, e = -1
+  // when x ==  0, e = 0
+  // x != 0 --> !x -1 = -1
+  // x == 0 --> !x -1 = 0
+  // int e = !x - 1; "-" not allowed, so use ~0 instead of -1
+  int e = !x + ~0;
+  return (e & y) | (~e & z);
 }
-/* 
- * isLessOrEqual - if x <= y  then return 1, else return 0 
+
+/*
+ * isLessOrEqual - if x <= y  then return 1, else return 0
  *   Example: isLessOrEqual(4,5) = 1.
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 24
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+  // x = TMin --> return 1
+  // x != TMin --> y - x >= 0
+  // if -x ^ x = 0, then x = TMin or x = 0
+  // -x = ~x + 1
+  // !x | ((~x + 1) ^ x) = 0, if and only if x = Tmin
+  // TODO
+  return !(!x | ((~x + 1) ^ x)) | !(((y + (~x + 1)) >> 31) & 1);
 }
-//4
-/* 
- * logicalNeg - implement the ! operator, using all of 
+
+/*
+ * logicalNeg - implement the ! operator, using all of
  *              the legal operators except !
  *   Examples: logicalNeg(3) = 0, logicalNeg(0) = 1
  *   Legal ops: ~ & ^ | + << >>
  *   Max ops: 12
- *   Rating: 4 
+ *   Rating: 4
  */
 int logicalNeg(int x) {
-  return 2;
+  // if (~x + 1) ^ x = 0, then x = TMin or x = 0
+  // ~x + 1 = 0, if and only if x = 0
+  // ~x & x = 0
+  // (x & ~0) + 1
+  // 7 0111 0000
+  // -8 1000
+  // TODO
+  return x;
+
 }
+
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
  *  Examples: howManyBits(12) = 5
@@ -246,10 +290,20 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
+  // 1110 1000 == 10 1000 == -24
+  // 1111 1011 == 1011 = -5
+  // 1111 1111 == 1 == -1
+  // 0001
+  // 1 0000
+  // if x > 0, then find the position of the most left 1
+  // if x < 0, then ~x, then find the most left 1 + 1
+  // if x = 0, then return 1
+  // TODO
   return 0;
 }
+
 //float
-/* 
+/*
  * floatScale2 - Return bit-level equivalent of expression 2*f for
  *   floating point argument f.
  *   Both the argument and result are passed as unsigned int's, but
@@ -261,9 +315,29 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
-  return 2;
+  // Bias = 2^(8-1) - 1 = 127
+  // NE = e - Bias = e - 127
+  // deNE = 1 - Bias = -126
+  // N: (1.f)*2^(e-127)
+  // deN: (0.f)*2^-126
+  unsigned s = uf >> 31;
+  unsigned e = (uf >> 23) & 0xff;
+  unsigned f = uf & 0x7fffff;
+  if (e == 0xff) {
+    return uf;
+  }
+  if (e != 0) {
+    e = e + 1;
+    return (s << 31) | (e << 23) | f;
+  }
+  if (e == 0) {
+    unsigned f2 = f << 1;
+    return (s << 31) | ((e + (f2 >> 23)) << 23) | (f2 & 0x7fffff);
+  }
+  return uf;
 }
-/* 
+
+/*
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
  *   for floating point argument f.
  *   Argument is passed as unsigned int, but
@@ -276,9 +350,27 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  return 2;
+  // Bias = 2^(8-1) - 1 = 127
+  // NE = e - Bias = e - 127
+  // deNE = 1 - Bias = -126
+  // N: (1.f)*2^(e-127)
+  // deN: (0.f)*2^-126
+  // 1011 1111 1000 0000 0000 0000 0000 0000
+  unsigned s = uf >> 31;
+  unsigned e = (uf >> 23) & 0xff;
+  unsigned f = uf & 0x7fffff;
+  if ((e == 0) || e < 127) {
+      return 0;
+  }
+  if (127 <= e && e <= 127 + 23) {
+    // 1.f * 2^(e-127)
+    unsigned rs = 23 - (e-127); // f right shift bits
+    unsigned rsf = 1 + (f >> rs); // right shifted result
+    return s == 0 ? rsf : ((-1 << (e-127)) | rsf); // arithmetic
+  }
+  return 0x80000000u;
 }
-/* 
+/*
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
  *   (2.0 raised to the power x) for any 32-bit integer x.
  *
@@ -286,11 +378,25 @@ int floatFloat2Int(unsigned uf) {
  *   representation as the single-precision floating-point number 2.0^x.
  *   If the result is too small to be represented as a denorm, return
  *   0. If too large, return +INF.
- * 
- *   Legal ops: Any integer/unsigned operations incl. ||, &&. Also if, while 
- *   Max ops: 30 
+ *
+ *   Legal ops: Any integer/unsigned operations incl. ||, &&. Also if, while
+ *   Max ops: 30
  *   Rating: 4
  */
 unsigned floatPower2(int x) {
-    return 2;
+    // Bias = 2^(8-1) - 1 = 127
+    // NE = e - Bias = e - 127
+    // deNE = 1 - Bias = -126
+    // 2^0
+    // 2^-1, 2^-2, 2^-3,..., 2^-126 ...
+    // 2^1, 2^2, 2^3, ..., 2^127 ...
+    if (x < -126) {
+      return 0;
+    }
+    if (-126 <= x && x <= 127) {
+      // 1.0 * 2^x
+      return (x + 127) << 23;
+    }
+    // +INF == 0111 1111 1000 0000 0000 0000 0000 0000
+    return 0x7f8 << 20;
 }
