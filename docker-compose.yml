@@ -9,7 +9,7 @@ services:
     tty: true
     stdin_open: true
     volumes:
-      - ./labs:/csapp
+      - ./:/csapp
     deploy:
       resources:
         limits:
