@@ -21,6 +21,8 @@ seq/ssim
 seq/ssim+
 pipe/psim
 
+pipe/*.yo
+pipe/*.ys
 y86-code/*.yo
 y86-code/*.ys
 
