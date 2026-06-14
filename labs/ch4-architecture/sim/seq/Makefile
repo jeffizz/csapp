@@ -23,7 +23,7 @@ TKINC=-isystem /usr/include/tcl8.5
 # flags.
 
 CC=gcc
-CFLAGS=-Wall -O2
+CFLAGS=-Wall -O2 -I$(TKINC) -I../misc -DUSE_INTERP_RESULT
 
 ##################################################
 # You shouldn't need to modify anything below here
@@ -45,7 +45,7 @@ ssim: seq-$(VERSION).hcl ssim.c  sim.h $(MISCDIR)/isa.c $(MISCDIR)/isa.h
 		seq-$(VERSION).c ssim.c $(MISCDIR)/isa.c $(LIBS)
 
 # This rule builds the SEQ+ simulator (ssim+)
-ssim+: seq+-std.hcl ssim.c sim.h $(MISCDIR)/isa.c $(MISCDIR)/isa.h 
+ssim+: seq+-std.hcl ssim.c sim.h $(MISCDIR)/isa.c $(MISCDIR)/isa.h
 	# Building the seq+-std.hcl version of SEQ+
 	$(HCL2C) -n seq+-std.hcl <seq+-std.hcl >seq+-std.c
 	$(CC) $(CFLAGS) $(INC) -o ssim+ \
